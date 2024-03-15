@@ -2,6 +2,7 @@
 return [
     'modules' =>[
         'Rate',
-        'ApiServices'
+        'ApiServices',
+        'Wallet'
     ]
 ];
