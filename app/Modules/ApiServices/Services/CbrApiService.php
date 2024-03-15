@@ -5,7 +5,6 @@ namespace App\Modules\ApiServices\Services;
 use App\Modules\ApiServices\Interfaces\BankRatesServiceInterface;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Http;
-use mysql_xdevapi\Exception;
 
 class CbrApiService implements BankRatesServiceInterface
 {
@@ -15,7 +14,7 @@ class CbrApiService implements BankRatesServiceInterface
       $this->cbr_root_url = config('app.api.cbr.root_url');
    }
 
-   public function getRates()
+   public function getRates(): array
    {
        try {
            $response = Http::get($this->cbr_root_url . '/latest.js');
@@ -27,7 +26,7 @@ class CbrApiService implements BankRatesServiceInterface
                    'message' => 'Cbr get rates failed'
                ], $response->status()));
            }
-       } catch (Exception $e) {
+       } catch (\Exception $e) {
            throw new HttpResponseException(response()->json([
                'message' => $e->getMessage()
            ], 500));

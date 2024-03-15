@@ -4,5 +4,5 @@ namespace App\Modules\ApiServices\Interfaces;
 
 interface BankRatesServiceInterface
 {
-  public function getRates();
+  public function getRates(): array;
 }
