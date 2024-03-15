@@ -1,0 +1,33 @@
+FROM nanoninja/php-fpm:8.1
+WORKDIR /var/www/html
+RUN docker-php-ext-configure pcntl --enable-pcntl \
+  && docker-php-ext-install pcntl;
+RUN docker-php-ext-install sockets
+RUN docker-php-ext-install ffi
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    zip \
+    unzip
+RUN apt-get install iputils-ping -y
+RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
+RUN alias composer='/usr/bin/composer'
+RUN apt-get update
+RUN useradd -ms /bin/bash spirit1086
+RUN chown -R spirit1086:spirit1086 /var/www/html
+RUN usermod -aG root spirit1086
+RUN usermod -a -G www-data spirit1086
+RUN chown -R spirit1086:www-data /var/www/html
+
+RUN find /var/www/html -type f -exec chmod 644 {} \;
+RUN find /var/www/html -type d -exec chmod 755 {} \;
+
+RUN apt-get update
+RUN apt-get install curl -y
+USER spirit1086
+
+#RUN apt-get install -y supervisor
+#RUN mkdir -p /var/log/supervisor
+#COPY ./etc/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+#RUN echo user=root >>  /etc/supervisor/conf.d/supervisord.conf
+#CMD ["/usr/bin/supervisord","-n"]
