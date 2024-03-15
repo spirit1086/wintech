@@ -6,6 +6,7 @@ cd docker folder
 ```
 docker-compose build
 docker-compose up -d
+docker exec -it w_php php artisan optimize
 ```
 
 db migrate 
