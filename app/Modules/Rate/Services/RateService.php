@@ -5,6 +5,7 @@ namespace App\Modules\Rate\Services;
 use App\Modules\Rate\Dto\RateDto;
 use App\Modules\Rate\Interfaces\RateInterface;
 use App\Modules\Rate\Interfaces\RateServiceInterface;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RateService implements RateServiceInterface
 {
@@ -17,6 +18,12 @@ class RateService implements RateServiceInterface
 
    public function save(RateDto $rateDto): void
    {
-       $this->rateRepository->setData($rateDto);
+       try{
+           $this->rateRepository->setData($rateDto);
+       }catch ( \Exception $e) {
+           throw new HttpResponseException(response()->json([
+               'message' => $e->getMessage()
+           ], 500));
+       }
    }
 }
