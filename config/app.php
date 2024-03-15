@@ -186,4 +186,10 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    'api' => [
+       'cbr' => [
+           'root_url' => env('CBR_ROOT_URL')
+       ]
+    ]
+
 ];
