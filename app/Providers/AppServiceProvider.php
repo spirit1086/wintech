@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Console\Commands\CbrRates;
+use App\Modules\ApiServices\Interfaces\BankRatesServiceInterface;
+use App\Modules\ApiServices\Services\CbrApiService;
 use App\Modules\Rate\Interfaces\RateInterface;
 use App\Modules\Rate\Interfaces\RateServiceInterface;
 use App\Modules\Rate\Repositories\RateRepository;
@@ -28,7 +31,10 @@ class AppServiceProvider extends ServiceProvider
             return new RateRepository();
         });
         $this->app->bind(RateServiceInterface::class, function (Application $app) {
-            return new RateService();
+            return new RateService(new RateRepository());
+        });
+        $this->app->bind(BankRatesServiceInterface::class, function (Application $app) {
+            return new CbrApiService();
         });
     }
 }
