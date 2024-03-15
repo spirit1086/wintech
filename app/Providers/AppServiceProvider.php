@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Console\Commands\CbrRates;
 use App\Modules\ApiServices\Interfaces\BankRatesServiceInterface;
 use App\Modules\ApiServices\Services\CbrApiService;
 use App\Modules\Rate\Interfaces\RateInterface;
