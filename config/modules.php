@@ -3,6 +3,7 @@ return [
     'modules' =>[
         'Rate',
         'ApiServices',
-        'Wallet'
+        'Wallet',
+        'User'
     ]
 ];

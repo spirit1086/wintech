@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Throwable;
 
@@ -60,10 +61,11 @@ class Handler extends ExceptionHandler
     private function apiResponse($exception,$request)
     {
         $trace = $exception->getTraceAsString();
+        Log::info('LOG_HANDLER_TRACE: ' .$trace);
         $message = $exception->getMessage()  && $exception->getMessage()!='' ? $exception->getMessage() : 'Плохой запрос';
         if ($exception instanceof HttpResponseException) {
             $code = $exception->getCode() > 0 ? $exception->getCode() : 500;
-            return  ['status'=>false,'message'=>$message . ' | ' .$trace,'code'=>$code];
+            return  ['status'=>false,'message'=>$message,'code'=>$code];
         }
 
         if ($exception instanceof \Illuminate\Auth\AuthenticationException || $exception instanceof  InvalidSignatureException) {
