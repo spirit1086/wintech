@@ -8,43 +8,38 @@ use App\Modules\User\Dto\LoginDto;
 use App\Modules\User\Interfaces\UserServiceInterface;
 use App\Modules\User\Requests\AuthRequest;
 use App\Modules\User\Requests\RegistrationRequest;
+use App\Modules\User\Resources\AuthResource;
 use App\Modules\User\Resources\UserResource;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Facades\DB;
+use App\Modules\User\Services\AuthUserService;
 
 class AuthController extends Controller
 {
     private UserServiceInterface $userService;
+    private AuthUserService $authUserService;
 
-    public function __construct(UserServiceInterface $userService)
+    public function __construct(UserServiceInterface $userService, AuthUserService $authUserService)
     {
         $this->userService = $userService;
+        $this->authUserService = $authUserService;
     }
 
     public function registration(RegistrationRequest $registrationRequest): UserResource
     {
-        try {
-            DB::beginTransaction();
-            $createUserDto = new CreateUserDto($registrationRequest);
-            $user = $this->userService->createNewUser($createUserDto);
-            DB::commit();
-            return new UserResource($user);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw new HttpResponseException(response()->json(['message' => $e->getMessage()]));
-        }
+        $createUserDto = new CreateUserDto($registrationRequest);
+        $user = $this->userService->createNewUser($createUserDto);
+        return new UserResource($user);
     }
 
     public function authentification(AuthRequest $authRequest)
     {
-        try {
-            DB::beginTransaction();
-            $loginDto = new LoginDto($authRequest);
+        $loginDto = new LoginDto($authRequest);
+        $user = $this->authUserService->login($loginDto);
+        $tokens = $this->authUserService->newTokens($user);
+        return new AuthResource($tokens);
+    }
 
-            DB::commit();
-        }  catch (\Exception $e) {
-            DB::rollBack();
-            throw new HttpResponseException(response()->json(['message' => $e->getMessage()]));
-        }
+    public function refreshToken()
+    {
+      return ['status' => true];
     }
 }
