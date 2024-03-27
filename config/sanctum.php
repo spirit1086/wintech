@@ -47,6 +47,8 @@ return [
     */
 
     'expiration' => null,
+    'access_expiration' => 60,              // One hour
+    'refresh_expiration' => 7 * 24 * 60,  // 7 Days
 
     /*
     |--------------------------------------------------------------------------
