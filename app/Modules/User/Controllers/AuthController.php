@@ -11,6 +11,7 @@ use App\Modules\User\Requests\RegistrationRequest;
 use App\Modules\User\Resources\AuthResource;
 use App\Modules\User\Resources\UserResource;
 use App\Modules\User\Services\AuthUserService;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -30,7 +31,7 @@ class AuthController extends Controller
         return new UserResource($user);
     }
 
-    public function authentification(AuthRequest $authRequest)
+    public function authentification(AuthRequest $authRequest): AuthResource
     {
         $loginDto = new LoginDto($authRequest);
         $user = $this->authUserService->login($loginDto);
@@ -38,8 +39,9 @@ class AuthController extends Controller
         return new AuthResource($tokens);
     }
 
-    public function refreshToken()
+    public function refreshToken(Request $request): AuthResource
     {
-      return ['status' => true];
+        $newTokens = $this->authUserService->refreshTokens($request);
+        return new AuthResource($newTokens);
     }
 }

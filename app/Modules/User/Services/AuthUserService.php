@@ -10,8 +10,10 @@ use App\Modules\User\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthUserService implements AuthUserServiceInterface, TokenInterface
 {
@@ -20,10 +22,26 @@ class AuthUserService implements AuthUserServiceInterface, TokenInterface
        if (Auth::attempt($loginDto->toArray())) {
            return Auth::user();
        }
-       return false;
+       throw new HttpResponseException(response()->json(['message' => 'Auth failed']));
    }
 
-   public function newTokens(Authenticatable $user): array
+   public function refreshTokens(Request $request): array
+   {
+       try {
+           DB::beginTransaction();
+           $token = PersonalAccessToken::findToken($request->bearerToken());
+           $user = $token->tokenable;
+           $user->tokens()->delete();
+           $newTokens = $this->newTokens($user);
+           DB::commit();
+           return $newTokens;
+       } catch (\Exception $e) {
+           DB::rollBack();
+           throw new HttpResponseException(response()->json(['message' => $e->getMessage()]));
+       }
+   }
+
+    public function newTokens(Authenticatable $user): array
    {
        try {
            DB::beginTransaction();
