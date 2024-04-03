@@ -7,6 +7,7 @@ use App\Modules\User\Enums\TokenEnum;
 use App\Modules\User\Interfaces\AuthUserServiceInterface;
 use App\Modules\User\Interfaces\TokenInterface;
 use App\Modules\User\Models\User;
+use App\Modules\User\Traits\Token;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -17,6 +18,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthUserService implements AuthUserServiceInterface, TokenInterface
 {
+   use Token;
    public function login(LoginDto $loginDto): Authenticatable|bool
    {
        if (Auth::attempt($loginDto->toArray())) {
@@ -29,8 +31,7 @@ class AuthUserService implements AuthUserServiceInterface, TokenInterface
    {
        try {
            DB::beginTransaction();
-           $token = PersonalAccessToken::findToken($request->bearerToken());
-           $user = $token->tokenable;
+           $user = self::getUser($request);
            $user->tokens()->delete();
            $newTokens = $this->newTokens($user);
            DB::commit();
@@ -45,6 +46,7 @@ class AuthUserService implements AuthUserServiceInterface, TokenInterface
    {
        try {
            DB::beginTransaction();
+               $user->tokens()->delete();
                $accessToken = $user->createToken('access-token',
                                                        [TokenEnum::ACCESS_TOKEN->value],
                                                        Carbon::now()->addMinutes(config('sanctum.access_expiration')));
