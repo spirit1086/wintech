@@ -12,6 +12,10 @@ use App\Modules\User\Interfaces\UserRepositoryInterface;
 use App\Modules\User\Interfaces\UserServiceInterface;
 use App\Modules\User\Repositories\UserRepository;
 use App\Modules\User\Services\UserService;
+use App\Modules\Wallet\Interfaces\WalletRepositoryInterface;
+use App\Modules\Wallet\Interfaces\WalletServiceInterface;
+use App\Modules\Wallet\Repositories\WalletRepository;
+use App\Modules\Wallet\Repositories\WalletService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
@@ -44,6 +48,12 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->bind(UserServiceInterface::class, function (Application $app) {
             return new UserService(new UserRepository());
+        });
+        $this->app->bind(WalletRepositoryInterface::class, function (Application $app) {
+            return new WalletRepository();
+        });
+        $this->app->bind(WalletServiceInterface::class, function (Application $app) {
+            return new WalletService(new WalletRepository());
         });
     }
 }
